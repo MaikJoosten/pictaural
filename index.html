@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PictAural</title>
+    <script src='https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js'></script>
+    <script src='https://surikov.github.io/webaudiofontdata/sound/0253_Acoustic_Guitar_sf2_file.js'></script>
+  </head>
+  <body>
+    <main>
+      <input type="file" onchange="readImageData()" />
+      <button onclick="startSample()">GO!</button>
+      <br>
+      <canvas width="10" height="10"></canvas>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
