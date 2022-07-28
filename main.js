@@ -1,22 +1,24 @@
+const button = document.querySelector('button')
 const preset = _tone_0253_Acoustic_Guitar_sf2_file
 const ac = new (window.AudioContext || window.webkitAudioContext)()
 const player = new WebAudioFontPlayer()
 player.adjustPreset(ac, preset)
 let notes = []
+let chords = []
 let queue = []
+let previousNote
 const maxRgb = (256 * 256 * 256) - 1
 const octave = 12
 const lowestNote = octave * 3
-const tonalRange = octave * 2
+const tonalRange = octave * 3
 const noteLength = 0.5
 
 const pushToQueue = (pitch) => {
-  const delay = 0.2
-  const prevNote = notes[notes.length - 1]
-  const start = prevNote ? prevNote.start + noteLength + delay : 0
+  const prevNote = queue[queue.length - 1]
+  const start = prevNote ? prevNote.start + (noteLength / 2) : 0
   queue.push({
     pitch,
-    duration: noteLength,
+    duration: noteLength * 2,
     start,
   })
 }
@@ -35,28 +37,29 @@ const playQueue = () => {
   queue = []
 }
 
-const sortNotes = () => {
-  notes.sort()
-  let currentNote = notes.shift()
-  queue.push(currentNote)
-  while (notes.length > 0) {
-    const nextNoteIndex = notes.findIndex((note) => {
-      const fifth = currentNote + 5
-      if (note === fifth || note > 12 && (note - 12) === fifth || note > 24 && (note - 24) === fifth) {
-        return true
-      }
-      const seventh = currentNote + 7
-      if (note === seventh || note > 12 && (note - 12) === seventh || note > 24 && (note - 24) === seventh) {
-        return true
-      }
-    })
-    if (nextNoteIndex) {
-      queue.push(notes.splice(nextNoteIndex, 1)[0])
-    } else {
-      break
+const findChord = () => {
+  const chord = []
+  firstNote = notes.shift()
+  chord.push(firstNote)
+  let nextNoteIndex = notes.findIndex((note) => note % 12 === (firstNote + 4) % 12)
+  if (nextNoteIndex > -1) {
+    chord.push(notes.splice(nextNoteIndex, 1)[0])
+    nextNoteIndex = notes.findIndex((note) => note % 12 === (firstNote + 4) % 12)
+    if (nextNoteIndex > -1) {
+      chord.push(notes.splice(nextNoteIndex, 1)[0])
     }
   }
-  playQueue()
+  chords.push(chord)
+}
+
+const sortNotes = () => {
+  notes.sort()
+  console.log('sortNotes ~ notes', notes)
+  while (notes.length > 0) {
+    findChord()
+  }
+  chords.flat().forEach(pushToQueue)
+  button.disabled = false
 }
 
 const readImageData = () => {
